@@ -4,11 +4,12 @@
 
 </head>
 <h1>ShopForEveryone</h1>
+<h2 id="groupName" class="display-4">Group Name</h2>
 
 <main id="main">
 
 
-    
+
 
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
@@ -26,11 +27,15 @@
     function joinGroup(){
         console.log("group joined")
         socket.emit('joinGroup', {
-            
+
             group: document.getElementById("groupID").value
         });
 
     }
+    socket.on('getGroup', (data) => {
+      document.getElementById("groupName").innerHTML = data.name
+      console.log("Getting group")
+    })
     firstTime()
 
 
