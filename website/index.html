@@ -1,5 +1,8 @@
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
 </head>
@@ -32,11 +35,44 @@
         });
 
     }
-    socket.on('getGroup', (data) => {
-      document.getElementById("groupName").innerHTML = data.name
+    function renderList(data){
+        main = document.getElementById("main")
+        main.innerHTML = "<ul class='list-group list-group-flush'>"
+        mainBody = main.innerHTML
+        for(i=0;i<data.length;i++){
+            main.innerHTML = main.innerHTML + "<li class='list-group-item'>" + data[i] + "<input id=" + "'" + i+ "'" +" type='checkbox'></li>"
+
+        }
+        main.innerHTML = main.innerHTML + "</ul>"
+        main.innerHTML = main.innerHTML + "<button onclick='gotItems("+data.length+")'>Got Items</button></form"
+        main.innerHTML = main.innerHTML + "<input id='newItem' placeholder='New Item'><button onclick='addItem()'>Add</button>"
+    }
+    function addItem(){
+        socket.emit('addItem',document.getElementById("newItem").value)
+    }
+    function gotItems(listLength){
+            var gotten = []
+            for(i=0;i<listLength;i++){
+                box = document.getElementById(i)
+                if(box.checked){
+                    gotten.push(i)
+                    
+                }
+                
+                }
+            socket.emit('gottenItems',{
+                items : gotten
+                    })
+         }
+   
+    socket.on('getGroup', (group) => {
+      document.getElementById("groupName").innerHTML = group.name
+      renderList(group.items)
       console.log("Getting group")
     })
     firstTime()
+
+    
 
 
 </script>
