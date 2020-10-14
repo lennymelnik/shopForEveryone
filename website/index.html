@@ -19,13 +19,22 @@
 
 <script>
 
-    var socket = io.connect("http://localhost",{transport : ['websocket']});
+    var socket = io.connect("http://108.41.44.173/",{transport : ['websocket']});
+    var currentGroupId = ""
+    function makeGroup(){
+        var group = {
+            name : document.getElementById("newGroupName").value,
+            key : document.getElementById("newGroupKey").value
+        }
+        console.log(group)
+        socket.emit('createGroup', group)
 
+    }
     function firstTime(){
 
         main = document.getElementById("main")
         main.innerHTML = `<input id="groupID"><button onclick="joinGroup()">Join Group</button>`
-
+        main.innerHTML = main.innerHTML + '<h4>Make a new group</h4><div class="input-group"> <input id="newGroupName" type="text" placeholder="Group Name"> <input id="newGroupKey" type="text" placeholder="Group Password"> </div><button onclick="makeGroup()">Create Group</button>'
     }
     function joinGroup(){
         console.log("group joined")
@@ -39,17 +48,24 @@
         main = document.getElementById("main")
         main.innerHTML = "<ul class='list-group list-group-flush'>"
         mainBody = main.innerHTML
-        for(i=0;i<data.length;i++){
+        if(data.length > 0){
+            for(i=0;i<data.length;i++){
             main.innerHTML = main.innerHTML + "<li class='list-group-item'>" + data[i] + "<input id=" + "'" + i+ "'" +" type='checkbox'></li>"
 
         }
         main.innerHTML = main.innerHTML + "</ul>"
         main.innerHTML = main.innerHTML + "<button onclick='gotItems("+data.length+")'>Got Items</button></form"
-        main.innerHTML = main.innerHTML + "<input id='newItem' placeholder='New Item'><button onclick='addItem()'>Add</button>"
+       
+        }
+      main.innerHTML = main.innerHTML + "<input id='newItem' placeholder='New Item'><button onclick='addItem()'>Add</button>"
     }
     function addItem(){
-        socket.emit('addItem',document.getElementById("newItem").value)
+        socket.emit('addItem',{
+            item : document.getElementById("newItem").value,
+            id : currentGroupId
+        })
     }
+    
     function gotItems(listLength){
             var gotten = []
             for(i=0;i<listLength;i++){
@@ -61,13 +77,15 @@
                 
                 }
             socket.emit('gottenItems',{
-                items : gotten
+                items : gotten,
+                groupId: currentGroupId
                     })
          }
    
     socket.on('getGroup', (group) => {
       document.getElementById("groupName").innerHTML = group.name
-      renderList(group.items)
+      currentGroupId = group.id
+      renderList(group.list)
       console.log("Getting group")
     })
     firstTime()
