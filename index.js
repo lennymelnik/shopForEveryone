@@ -1,7 +1,9 @@
 const { group } = require('console');
 const { query } = require('express');
 
-var app = require('express')();
+var express  = require('express');
+
+app = express.Router()
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var MongoClient = require('mongodb').MongoClient;
@@ -14,10 +16,7 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/website/index.html');
 });
 
-var groupOBJ = {
-  name : "Bobs food",
-  items : ["Chocolate Milk", "Nuggie", "Tendies", "Happiness"]
-}
+
 MongoClient.connect(url, function(err,db){
   if (err) throw err;
   dbo = db.db("smallProjects");
@@ -147,7 +146,6 @@ MongoClient.connect(url, function(err,db){
   });
 
 
-  http.listen(80, () => {
-    console.log('listening on *:80');
-  });
 })
+http.listen(3001)
+module.exports = { app : app }
